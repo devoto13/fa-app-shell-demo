@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { faSun } from '@fortawesome/fontawesome-free-regular';
 
 @Component({
   selector: 'app-shell',
@@ -6,4 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app-shell.component.css']
 })
 export class AppShellComponent {
+  spinner = faSun;
 }

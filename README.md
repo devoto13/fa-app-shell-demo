@@ -1,27 +1,31 @@
-# AppShell
+# FontAwesome 5 icon as a application spinner
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.1.
+This uses app shell feature of Angular CLI to display FontAwesome 5 icon as a spinner while bootstraping an application.
 
-## Development server
+### Background
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+I didn't find a good documentation on this feature to link here, so I'll write a short background information here. 
 
-## Code scaffolding
+The idea of app shell is very simple. It uses `@angular/platform-server` package to render one of the routes as a string (same as you would do for server side rendering), but instead of doing it on the server for every request it does it once at the build time and replaces content of the `index.html` with the rendered app shell route. This approach allows to use all the features of Angular to render initial application state, but does not require any special server to serve the application.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Issue
 
-## Build
+As it turns out `@angular/platform-server` only understands CSS included in the `@Component({ styleUrls: [ ... ] })` and other standard means, but does not understand if they are loaded dynamically by custom JS (as FontAwesome library currently does). As a result the rendered app shell route does not include FontAwesome CSS on load. Which leads to the problem described here: https://github.com/FortAwesome/angular-fontawesome/issues/18.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+### Reproduction steps
 
-## Running unit tests
+1. `npm install` - install dependencies
+2. `npm run server` - build application with app shell and start server
+3. Load application in the browser. Now you should see dashboard page almost right away.
+4. To reproduce the issue disable JavaScript (spinner should be visible and spinning with pure SVG + CSS without any JS executed) and reload the page.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Actual behavior: Spinner icon is not spinning and is taking whole screen.
+Desired behavior: Spinner icons is spinning, centered and is 32px high.
 
-## Running end-to-end tests
+### Workaround
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Uncomment FontAwesome CSS in the `src/styles.css` and restart `npm run server`. This confirms that the issue is because of missing FontAwesome CSS.
 
-## Further help
+### Proper solution
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+I think `angular-fontawesome` should include CSS by utilizing `@Component({ styleUrls: [ ... ] })` for `FaIcon` component instead of inserting it dynamically. This way it will work within Angular application shell and also Angular server side rendering (also known as Universal), because it utilizes `@angular/platform-server` under the hood as well. 

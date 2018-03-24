@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { faWindowMaximize } from '@fortawesome/fontawesome-free-regular';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,4 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
+  windowMaximize = faWindowMaximize;
 }
